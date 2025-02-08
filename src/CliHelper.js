@@ -101,12 +101,13 @@ const CliHelper = {
   printAgentMessageProgress(chunk, spinner, prevChunkLines) {
     spinner.clear();
 
+    // we need to clear the previous partial message and redo it
     if (prevChunkLines > 0) {
       this.clearLastLine(prevChunkLines + 1); // +1 to account for extra space
     }
 
     console.log(chunk);
-    console.log(); // space between end of output an spinner
+    console.log(); // space between end of output and spinner
     spinner.render();
   },
 

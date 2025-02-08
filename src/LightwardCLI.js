@@ -12,7 +12,7 @@ const LightwardCLI = {
   async run() {
     try {
       // get the history
-      this.convoHistory = await ConvoHistory.build(args.conversationFile);
+      this.convoHistory = await ConvoHistory.build(args.conversation);
 
       // say hello
       this.printWelcomeMessage();  

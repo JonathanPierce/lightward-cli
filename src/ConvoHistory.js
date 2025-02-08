@@ -1,4 +1,6 @@
 import fs from 'fs-extra';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 export const ROLES = {
   USER: 'user',
@@ -6,7 +8,9 @@ export const ROLES = {
 };
 
 class ConvoHistory {
-  static async build(path) {
+  static async build(name) {
+    const path = this.buildPath(name);
+
     if (await fs.exists(path)) {
       const data = await fs.readFile(path);
       return new ConvoHistory(path, JSON.parse(data));
@@ -14,6 +18,10 @@ class ConvoHistory {
 
     // does not exist yet, create a blank
     return new ConvoHistory(path, []);
+  }
+
+  static buildPath(name) {
+    return path.join(path.dirname(fileURLToPath(import.meta.url)), '../conversations', `${name}.json`);
   }
 
   constructor(path, history) {

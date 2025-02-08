@@ -13,10 +13,10 @@ const args = yargs(hideBin(process.argv))
       default: false,
       description: 'resets the convo, choosing the slow reader option'
     },
-    'conversation-file': {
+    'conversation': {
       type: 'string',
-      default: './history.json',
-      description: 'path to the conversation history file, will default to ./history.json.json'
+      default: 'history',
+      description: 'name of the conversation history file, mapping to conversations/<name>.json in this directory'
     },
     'message': {
       type: 'string',
