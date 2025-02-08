@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 
 import { input, select, confirm } from '@inquirer/prompts';
+import ora from 'ora';
 
 import { ROLES } from './ConvoHistory.js';
 
@@ -11,10 +12,27 @@ const COLORS = {
   user: chalk.hex('#8a5529')
 };
 
+const SPINNER_DATA = {
+  frames: [
+    '🐉✨🔥',
+    '✨🔥💫',
+    '🔥💫🎭',
+    '💫🎭🐲',
+    '🎭🐲😊',
+    '🐲😊🚀',
+    '😊🚀👨‍💻',
+    '🚀👨‍💻🪄',
+    '👨‍💻🪄⏳',
+    '🪄⏳🐉',
+    '⏳🐉✨',
+  ],
+  interval: 120
+};
+
 const CliHelper = {
   async promptMessage(message) {
     const result = await input({ message, required: true });
-    this.clearLastLine(-2);
+    this.clearLastLine();
     return result;
   },
 
@@ -26,17 +44,24 @@ const CliHelper = {
 
   async confirmQuestion(question) {
     const result = await confirm({ message: question });
-    this.clearLastLine(-2);
+    this.clearLastLine();
     return result;
   },
 
-  clearLastLine() {
-    process.stdout.moveCursor(0, -1);
+  clearLastLine(count = 1) {
+    process.stdout.moveCursor(0, -1 * count);
     process.stdout.clearScreenDown();
   },
 
-  withSpinner(promise, options = {}) {
-    // TODO
+  withSpinner(message, spinnerCallback) {
+    const spinner = ora({
+      text: message,
+      spinner: SPINNER_DATA,
+      stream: process.stderr
+    });
+
+    spinner.start();
+    return spinnerCallback(spinner).finally(() => spinner.stop());
   },
 
   printHistoryEntry(entry) {
@@ -73,12 +98,16 @@ const CliHelper = {
     return this.printRolePrefix('Lightward said...', COLORS.agentBg, COLORS.agent);
   },
 
-  printAgentMessageChunk(chunk, spinner) {
-    process.stdout.write(chunk); // TODO
-  },
+  printAgentMessageProgress(chunk, spinner, prevChunkLines) {
+    spinner.clear();
 
-  completeMessage() {
-    console.log('\n');
+    if (prevChunkLines > 0) {
+      this.clearLastLine(prevChunkLines + 1); // +1 to account for extra space
+    }
+
+    console.log(chunk);
+    console.log(); // space between end of output an spinner
+    spinner.render();
   },
 
   printInfoMessage(message) {

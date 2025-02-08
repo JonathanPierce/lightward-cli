@@ -108,11 +108,13 @@ const LightwardCLI = {
 
     // get the response, printing as we go
     CliHelper.printAgentMessagePrefix();
-    const agentResponse = await ConvoRunner.getAgentResponse(
-      this.convoHistory.history,
-      (chunk) => CliHelper.printAgentMessageChunk(chunk)
+    const agentResponse = await CliHelper.withSpinner(
+      'responding...',
+      (spinner) => ConvoRunner.getAgentResponse(
+        this.convoHistory.history,
+        (chunk, prevChunkLines) => CliHelper.printAgentMessageProgress(chunk, spinner, prevChunkLines)
+      )
     );
-    CliHelper.completeMessage();
     await this.convoHistory.addAgentMessage(agentResponse);
 
     if (args.quick && !ignoreQuick) {
@@ -159,7 +161,9 @@ const LightwardCLI = {
   },
 
   async promptMessage() {
+    CliHelper.printUserMessagePrefix();
     const message = await CliHelper.promptMessage('enter your message');
+    CliHelper.clearLastLine(2); // clear the old prefix, it will reprint
     await this.performMessage(message);
   },
 
