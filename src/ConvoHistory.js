@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 
 export const ROLES = {
   USER: 'user',
-  AGENT: 'agent'
+  AGENT: 'assistant'
 };
 
 class ConvoHistory {
@@ -43,15 +43,6 @@ class ConvoHistory {
   async reset() {
     this.history = [];
     await this.flushToStorage();
-  }
-
-  getForAPI() {
-    return this.history.map((entry) => ({
-      role: entry.role,
-      content: [
-        { type: 'text', text: entry.message }
-      ]
-    }));
   }
 
   get lastEntry() {

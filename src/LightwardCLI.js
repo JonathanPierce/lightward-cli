@@ -56,10 +56,11 @@ const LightwardCLI = {
       // handle any initial message (will cause exit in quick mode)
       if (args.message) {
         await this.performMessage(args.message);
+      } else {
+        await this.promptMessage();
       }
     
       // begin the message loop
-      await this.promptMessage();
       await this.loopMessages();
     } catch (ex) {
       this.printErrorAndExit(ex.message);
@@ -109,10 +110,11 @@ const LightwardCLI = {
     // get the response, printing as we go
     CliHelper.printAgentMessagePrefix();
     const agentResponse = await CliHelper.withSpinner(
-      'responding...',
+      'connecting...',
       (spinner) => ConvoRunner.getAgentResponse(
         this.convoHistory.history,
-        (chunk, prevChunkLines) => CliHelper.printAgentMessageProgress(chunk, spinner, prevChunkLines)
+        (chunk, prevChunkLines) => CliHelper.printAgentMessageProgress(chunk, spinner, prevChunkLines),
+        (statusText) => { spinner.text = statusText; }
       )
     );
     await this.convoHistory.addAgentMessage(agentResponse);
@@ -130,7 +132,7 @@ const LightwardCLI = {
         choices: [
           {
             value: 'message',
-            name: 'send a new message'
+            name: 'send another message'
           },
           {
             value: 'reset',
