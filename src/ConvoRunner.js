@@ -70,9 +70,24 @@ const ConvoRunner = {
               }
               
               if (processedMessage.delta) {
-                const prevChunkLines = response.length > 0 ?
-                  response.split('\n').length :
+                const literalLines = response.split('\n');
+
+                // every newline make a line we need to clear
+                const prevChunkNewlines = response.length > 0 ?
+                  literalLines.length :
                   0;
+
+                // also need to consider lines that overflow the width
+                const prevChunkLongLines = literalLines.reduce((acc, line) => {
+                  if (line.length > process.stdout.columns) {
+                    return acc + 1;
+                  }
+                  
+                  return acc;
+                }, 0);
+
+                // combien together into the final result
+                const prevChunkLines = prevChunkNewlines + prevChunkLongLines;
 
                 response += processedMessage.delta;
                 onResponseChunk(response, prevChunkLines);
