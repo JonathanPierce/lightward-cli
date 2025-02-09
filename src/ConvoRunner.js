@@ -2,6 +2,7 @@ import { JSDOM } from 'jsdom';
 
 import fetch from 'node-fetch';
 import { createConsumer, adapters } from '@rails/actioncable';
+import { stdout } from 'process';
 
 // ActionCable is designed to run in a browser, not node. However, we can get it working
 // with some shims sourced from JSDOM
@@ -80,7 +81,7 @@ const ConvoRunner = {
                 // also need to consider lines that overflow the width
                 const prevChunkLongLines = literalLines.reduce((acc, line) => {
                   if (line.length > process.stdout.columns) {
-                    return acc + 1;
+                    return acc + Math.floor(line.length / process.stdout.columns);
                   }
                   
                   return acc;
